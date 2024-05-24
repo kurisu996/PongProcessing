@@ -13,6 +13,7 @@ Paddle paddle;
 Ball ball;
 Game game;
 ButtonsAndMenus BAM;
+PowerUp pUp;
 float random = 0;
 PImage backgroundImage;
 int paddleWidth = 20;
@@ -29,6 +30,9 @@ int entireScore = 0;
 int Level = 1;
 int nextPaddleSpeedLevel = 0;
 int lastLevelTime = 0;
+int numPowerUps = 5;
+int leftOrRight = 0;
+PowerUp[] powerUps = new PowerUp[numPowerUps];
 
 //------------------KLASSEN FÜR OBJEKTE, KNÖPFE UND SPIELFUNKTIONEN---------------------------
 
@@ -258,21 +262,40 @@ void mousePressed() {
   if (!gameStarted && BAM.overButton(width / 6, height / 2 - 50, 200, 100)) {
     customPressed = true;
   }
-  if (customPressed && !gameStarted && BAM.overButton(width - 250, height - 150, 200, 100)) {
+  if (customPressed && !gameStarted && !modiPressed && BAM.overButton(width - 250, height - 150, 200, 100)) {
     for(int i = 0; i < Level; i++){
       ballSpeedX *= 1.1;
       ballSpeedY *= 1.1;
     }
     gameStarted = true;
   }
-  if (customPressed && !gameStarted && BAM.overButton(width / 2 - 450, height / 2 - 40, 200, 100)) {
+  if (customPressed && !gameStarted && !modiPressed && BAM.overButton(width / 2 - 450, height / 2 - 40, 200, 100)) {
     Level--;
   }
-  if (customPressed && !gameStarted && BAM.overButton(width / 2 + 250, height / 2 - 40, 200, 100)) {
+  if (customPressed && !gameStarted && !modiPressed && BAM.overButton(width / 2 + 250, height / 2 - 40, 200, 100)) {
     Level++;
   }
-  if (!gameStarted && BAM.overButton(width / 1.4, height / 2 - 50, 200, 100)) {
+  if (!customPressed && !gameStarted && BAM.overButton(width / 1.4, height / 2 - 50, 200, 100)) {
     modiPressed = true;
+  }
+}
+
+class PowerUp {
+  int x, y;
+  int size;
+  float speed;
+  color col;
+  
+  void spawnPowerUp() {
+    y = round(random(height));
+    size = round(random(10, 30));
+    if (leftOrRight == 1) {
+      x = 30;
+    }
+    if (leftOrRight == 2) {
+      x = width - 40;
+    }
+    ellipse(x,y,size,size);
   }
 }
 
@@ -286,11 +309,12 @@ void setup() {
   ball = new Ball();
   game = new Game();
   BAM = new ButtonsAndMenus();
+  pUp = new PowerUp();
   ball.resetBall();
   leftPaddleY = height / 2 - paddleHeight / 2;
   rightPaddleY = height / 2 - paddleHeight / 2;
   frameRate(144);
-  lastLevelTime = millis(); // Initialisierung des Zeitstempels
+  lastLevelTime = millis(); 
 }
 
 void draw() {
