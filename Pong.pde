@@ -7,6 +7,8 @@ boolean wPressed = false;
 boolean sPressed = false;
 boolean oPressed = false;
 boolean lPressed = false;
+boolean lefthit = false;
+boolean righthit = false;
 
 //------------INITIALISIERUNG VERSCHIEDENSTER VARIABLEN UND KLASSEN-------------------------------------
 Paddle paddle;
@@ -38,7 +40,7 @@ class Paddle {
   void create() {
     fill(255);
     rect(30, leftPaddleY, paddleWidth, paddleHeight);
-    rect(width - 40, rightPaddleY, paddleWidth, paddleHeight);
+    rect(width - 50, rightPaddleY, paddleWidth, paddleHeight);
   }
 
 //..............WOHIN SICH DIE PADDLES BEWEGEN UND WIE SCHNELL SIE DAS TUN.............
@@ -82,11 +84,11 @@ class Ball {
     if (ballY < 0 || ballY > height) {
       ballSpeedY *= -1;
     }
-    if (ballX < 0) {
+    if (ballX < 10) {
       rightScore++;
       resetBall();
     } 
-    else if (ballX > width) {
+    else if (ballX > width-10) {
       leftScore++;
       resetBall();
     }
@@ -183,13 +185,17 @@ class Game {
   
   void checkCollisions() {
     //linkes paddle
-    if (ballX - ballSize / 2 < 30 + paddleWidth && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) {
+    if (ballX - ballSize / 2 < 30 + paddleWidth && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight && lefthit == false) {
       ballSpeedX *= -1;
+      lefthit = true;
+      righthit = false;
     }
 
     //rechtes paddle
-    if (ballX + ballSize / 2 > width - 40 && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight) {
+    if (ballX + ballSize / 2 > width - 50 && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight && righthit == false) {
       ballSpeedX *= -1;
+      righthit = true;
+      lefthit = false;
     }
   }
 
@@ -218,6 +224,10 @@ class Game {
       nextPaddleSpeedLevel += 6;
     }
   }
+}
+
+class obsicles {
+  
 }
 
 //---------------------------------TASTENABFRAGEN--------------------------------------------------
@@ -252,13 +262,13 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  if (!gameStarted && BAM.overButton(width / 2 - 100, height / 2 - 50, 200, 100)) {
+  if (!gameStarted && !customPressed && !modiPressed && BAM.overButton(width / 2 - 100, height / 2 - 50, 200, 100)) {
     gameStarted = true;
   }
-  if (!gameStarted && BAM.overButton(width / 6, height / 2 - 50, 200, 100)) {
+  if (!gameStarted && !modiPressed && BAM.overButton(width / 6, height / 2 - 50, 200, 100)) {
     customPressed = true;
   }
-  if (customPressed && !gameStarted && BAM.overButton(width - 250, height - 150, 200, 100)) {
+  if (customPressed && !modiPressed && !gameStarted && BAM.overButton(width - 250, height - 150, 200, 100)) {
     for(int i = 0; i < Level; i++){
       ballSpeedX *= 1.1;
       ballSpeedY *= 1.1;
@@ -271,7 +281,7 @@ void mousePressed() {
   if (customPressed && !gameStarted && BAM.overButton(width / 2 + 250, height / 2 - 40, 200, 100)) {
     Level++;
   }
-  if (!gameStarted && BAM.overButton(width / 1.4, height / 2 - 50, 200, 100)) {
+  if (!customPressed && !gameStarted && BAM.overButton(width / 1.4, height / 2 - 50, 200, 100)) {
     modiPressed = true;
   }
 }
@@ -296,10 +306,10 @@ void setup() {
 void draw() {
   if (!gameStarted) {
     BAM.showMainMenu();
-    if (customPressed) {
+    if (customPressed && !gameStarted && !modiPressed) {
       BAM.showCustomMenu();
     }
-    if (modiPressed) {
+    if (modiPressed && !gameStarted && !customPressed) {
       BAM.showModiMenu();
     }
   }
